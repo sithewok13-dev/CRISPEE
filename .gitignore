@@ -1,0 +1,8 @@
+# Godot
+.godot/
+*.translation
+
+# Export output
+build/
+*.ipa
+xcode-project.tar
