@@ -42,6 +42,11 @@ Every push runs `.github/workflows/ios.yml`:
 3. Publishes the `.ipa` as a **GitHub pre-release** (`build-N`) and as a workflow
    artifact.
 
+**Fallback: Codemagic.** If GitHub Actions can't run for the account,
+`codemagic.yaml` does the same build on Codemagic's Macs. Sign in at
+codemagic.io with GitHub, add this repository, and start the `ios-unsigned`
+workflow. The `.ipa` appears under the build's artifacts.
+
 An unsigned `.ipa` won't install as is. A sideloading tool re-signs it with
 *your* Apple ID:
 
