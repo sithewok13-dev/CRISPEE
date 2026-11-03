@@ -6,10 +6,10 @@ As of 2026-11-03. Review copy: https://claude.ai/artifact/K5aYngxp8PYnrQmBYo5JvH
 
 CRISPEE is a 3D third-person comedy platformer about an eight-pound blonde terrier who believes everything he pees on belongs to him. The world agrees, and takes his claims with escalating seriousness.
 
-- **Crispee** is recognizably the owner's real dog: scruffy cream-and-blonde coat, little beard, floppy ears, skinny legs, upright tail. No diaper. He stays on four legs and behaves like a dog.
+- **Crispee** is the owner's real dog, rendered realistically: scruffy cream-and-blonde coat, little beard, floppy ears, skinny legs, upright tail. He wears his red devil costume, a hood with two stuffed horns and a cape with black trim. It is his outfit, not an unlockable. No diaper. He stays on four legs and behaves like a dog.
 - **The joke** is in the systems, not the lines. Humans reorganize their lives around Crispee's ownership while he cares about smells, snacks, comfort, and claiming things.
 - **References**: Stray for movement, camera, and the feeling that environments are enormous from dog height. Untitled Goose Game for level structure and mischief comedy. Katamari for the escalation of scale. Jedi Knight for the power wheel and Force-style vision.
-- **Look**: stylized 3D, warm lighting, expressive animation, an original world.
+- **Look**: realistic 3D, not stylized and not low-poly. Warm lighting, expressive animation, an original world. The in-game Crispee should be mistakable for a photo of him.
 - **Story arc**: home, then yard and street, then town, then a space center, then orbit, then parallel universes (home with things subtly wrong). The ending is puppy Crispee looking at Earth in a solemn 2001-style scene, one tiny puppy pee, cut to black. The synthetic-pee empire stays optional.
 
 ## Core mechanic: claiming
@@ -149,13 +149,19 @@ Unity is the stronger 3D engine, and with a Mac and a human in the editor it wou
 
 ## Art and animation
 
-The biggest risk in the project is not code. It is art and animation. A Stray-like game is sold by its animal.
+The biggest risk in the project is not code. It is the dog. The direction is realistic, in costume, and Claude cannot sculpt a realistic dog. Claude can do everything around one: the costume, the rig, the animation, the levels, the shaders, the build.
 
-**Proposed path: low-poly stylized Crispee, generated from the owner's photos.** Claude scripts Blender to build him from the reference pictures, rigs him, and drives most motion procedurally in Godot: inverse-kinematics legs that find the ground, a physics tail, floppy ears that react to movement. The style reads as charming on a phone and is the one Untitled Goose Game and A Short Hike used for the same reasons.
+**Decided: realistic Crispee, wearing the devil costume.** Low-poly and stylized directions were mocked up on 2026-11-03 and rejected.
 
-**Alternative:** buy or commission one fluffier, more detailed model, and Claude handles everything else.
+Three paths for the model itself:
 
-The owner has reference photos of Crispee. The decision between the two paths is made when they are shared, with an honest estimate of how close the generated version can get. Extra is the same rig recolored black, with his own idle and walk attitude.
+1. **Commissioned model. Recommended.** An artist builds Crispee from the photos: head, body, fur, hood and cape. Claude writes the brief and a turnaround sheet, then rigs, animates and ships it. A few hundred to a few thousand dollars, a few weeks. The only path that reliably looks like him.
+2. **Image-to-3D generation. The stand-in.** A photo becomes a textured mesh in minutes. Fur comes out as a painted shell and the face is unreliable. Good enough to get the first playable moving, not good enough to ship.
+3. **Purchased terrier base, re-dressed.** A realistic small-terrier model retextured and reshaped toward the photos. Faster than a commission, but a dog that resembles Crispee rather than Crispee.
+
+**Why the costume helps.** Cloth is far easier than fur. The hood hides the ears and the back of the head, the cape covers the body, so the budget goes to the face and the beard. The cape gets a simple bone chain so it swings. The horns are rigid on the hood. Fur on iPhone is shells or cards, a few thousand triangles, the heaviest thing on screen.
+
+**Plan.** The first playable uses a stand-in from path 2 or 3 so movement and camera get built now. The real model is the one external dependency in the project, so that search starts early. Extra gets the same treatment later: a realistic black Chihuahua, no costume. Target-look mockups, built from the photos with the game's HUD: https://claude.ai/artifact/U6xdf3z89U5afNdxfjCEne
 
 ## First playable and open decisions
 
@@ -174,11 +180,12 @@ The owner has reference photos of Crispee. The decision between the two paths is
 - Extra: black Chihuahua, same size as Crispee, contested claims, race or trap
 - Bladder as light pacing. No failure state. No spoken dialogue
 - 3D third person with a semi-automatic camera. First person only inside powers
+- Realistic Crispee in his devil costume. Stylized and low-poly rejected
 - Godot 4 with Linux screenshot CI from day one
 
 **Still open**
 
-- [ ] Art path: generated low-poly Crispee or a commissioned model, decided from the photos
+- [ ] Who makes the realistic model: commission, image-to-3D stand-in, or purchased base
 - [ ] The first level's claim list: each spot, what it changes, what it unlocks
 - [ ] Which two or three powers are available in level one
 - [ ] Exact par and spot counts per level
