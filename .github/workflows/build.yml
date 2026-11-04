@@ -86,6 +86,11 @@ jobs:
           tail -5 xcodebuild.log
           APP=$(find dd/Build/Products/$CONFIG-iphoneos -maxdepth 1 -name "*.app" | head -1)
           test -x "$APP/CRISPEE" || { echo "no executable in $APP"; ls -la "$APP"; exit 1; }
+          # Nothing may be nested under Frameworks: sideloading tools often fail to re-sign nested libraries
+          # and iOS then kills the app silently at launch. The only thing Xcode puts there is the Swift
+          # Concurrency back-deployment library for iOS < 15, which this app does not support.
+          rm -rf "$APP/Frameworks"
+          ls -la "$APP"
           mkdir -p Payload && cp -R "$APP" Payload/
           zip -qr ../../CRISPEE-iOS-unsigned.ipa Payload
           ls -la ../../CRISPEE-iOS-unsigned.ipa
