@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["game/**", ".github/workflows/build.yml"]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "Release tag to publish the IPA to (empty = ios-latest only)"
+        required: false
+        default: ""
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  screenshots:
+    name: Linux screenshots
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot and a virtual screen
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q xvfb mesa-utils libgl1-mesa-dri > /dev/null
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot && chmod +x godot
+      - name: Import the project
+        run: ./godot --headless --path game --import --quit 2>&1 | grep -v ALSA || true
+      - name: Play through the living room and save screenshots
+        run: |
+          LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1280x720x24" ./godot --path game --rendering-driver opengl3 --resolution 1280x720 -- --shots="$PWD/shots" 2>&1 | grep -v -E "ALSA|audio" | tee run.log
+          grep -q "finished true" run.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: shots/*.png
+
+  ios:
+    name: iOS unsigned IPA
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Godot and the export templates
+        run: |
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
+          unzip -q godot.zip
+          curl -sSL -o templates.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          mkdir -p "$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable"
+          unzip -q templates.tpz -d tpl && mv tpl/templates/* "$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable/"
+      - name: Export the Xcode project
+        run: |
+          G="./Godot.app/Contents/MacOS/Godot"
+          "$G" --headless --path game --import --quit || true
+          mkdir -p build/ios
+          "$G" --headless --path game --export-release iOS "$PWD/build/ios/CRISPEE.xcodeproj"
+          ls build/ios
+      - name: Build without signing and package the IPA
+        run: |
+          cd build/ios
+          xcodebuild -project CRISPEE.xcodeproj -scheme CRISPEE -configuration Release -sdk iphoneos \
+            -derivedDataPath dd CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER="" build | tail -40
+          APP=$(find dd/Build/Products/Release-iphoneos -maxdepth 1 -name "*.app" | head -1)
+          mkdir -p Payload && cp -R "$APP" Payload/
+          zip -qr ../../CRISPEE-iOS-unsigned.ipa Payload
+          ls -la ../../CRISPEE-iOS-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CRISPEE-iOS-unsigned
+          path: CRISPEE-iOS-unsigned.ipa
+      - name: Publish to the ios-latest release
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.event.inputs.release }}"
+          for t in ios-latest $TAG; do
+            gh release view "$t" >/dev/null 2>&1 || gh release create "$t" --title "$t" --notes "CRISPEE iOS build, unsigned. Sideload like the other ports." --prerelease
+            gh release upload "$t" CRISPEE-iOS-unsigned.ipa --clobber
+          done
