@@ -17,7 +17,13 @@ var _coyote := 0.0
 var _buffer := 0.0
 var _facing := 0.0
 var body_pivot: Node3D
-var current_spot: ClaimSpot
+var spots_in: Array = []
+var current_spot: ClaimSpot:
+	get:
+		for sp in spots_in:
+			if not sp.is_owned():
+				return sp
+		return spots_in[0] if spots_in.size() > 0 else null
 var near_human: Node3D
 var near_water := false
 var is_peeing := false

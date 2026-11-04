@@ -94,7 +94,7 @@ func build() -> void:
 	_spot("purse", "Grandma's purse", "Grandma moves her wallet to a bag Crispee has not met yet. The purse stays. It is Crispee's.", Vector3(0.2, 0.55, -0.7), Vector3(0.5, 0.3, 0.4))
 	_spot("cushion", "The couch cushion", "The family will sit on the floor from now on. The cushion is Crispee's.", Vector3(0.5, 0.6, -2.35), Vector3(0.7, 0.3, 0.6))
 	_spot("acbox", "The air conditioner box", "Dad moves the box under the thermostat so Crispee can reach it. He thinks it is a step. It is.", Vector3(1.75, 0.72, -2.3), Vector3(0.6, 0.3, 0.6), "box_moved")
-	_spot("thermostat", "The thermostat", "The house is now set to 58 degrees. Dad opens the hallway door to let the heat in. The hallway is next.", Vector3(3.2, 1.05, -1.2), Vector3(0.5, 0.5, 0.6), "door_open")
+	_spot("thermostat", "The thermostat", "The house is now set to 58 degrees. Dad opens the hallway door to let the heat in. The hallway is next.", Vector3(3.15, 0.95, -1.2), Vector3(0.6, 0.7, 0.7), "door_open")
 	_spot("catbed", "The cat's bed", "The cat has seen everything. The cat says nothing.", Vector3(-3.15, 0.15, -2.6), Vector3(0.5, 0.3, 0.5))
 	Game.world_changed.connect(_on_world_changed)
 
@@ -124,6 +124,7 @@ func _on_dad_arrived(tag: String) -> void:
 			ac_box.position = Vector3(2.95, 0.3, -1.2)
 			ac_box.collision_layer = 1
 			spots["acbox"].position = Vector3(2.95, 0.72, -1.2)
+			spots["thermostat"].position = Vector3(3.15, 0.95, -1.2)
 			dad.walk_to(Vector3(2.0, 0, 0.6), "")
 		"at_door":
 			var tw := create_tween()

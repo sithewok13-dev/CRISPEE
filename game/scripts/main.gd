@@ -28,8 +28,8 @@ func _ready() -> void:
 	dog.prompt_changed.connect(func(t): hud.set_prompt(t))
 	Game.claimed.connect(_on_claimed)
 	for s in Game.spots:
-		s.body_entered.connect(func(b): if b == dog: dog.current_spot = s)
-		s.body_exited.connect(func(b): if b == dog and dog.current_spot == s: dog.current_spot = null)
+		s.body_entered.connect(func(b): if b == dog and not dog.spots_in.has(s): dog.spots_in.append(s))
+		s.body_exited.connect(func(b): if b == dog: dog.spots_in.erase(s))
 	level.water.body_entered.connect(func(b): if b == dog: dog.near_water = true)
 	level.water.body_exited.connect(func(b): if b == dog: dog.near_water = false)
 	level.exit_zone.body_entered.connect(func(b): if b == dog: _try_exit())

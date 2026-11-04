@@ -11,6 +11,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write
+
 env:
   GODOT_VERSION: "4.7.2"
 
@@ -22,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Godot and a virtual screen
         run: |
-          sudo apt-get update -q && sudo apt-get install -y -q xvfb mesa-utils libgl1-mesa-dri > /dev/null
+          sudo apt-get update -q && sudo apt-get install -y -q xvfb mesa-utils libgl1-mesa-dri libpulse0 > /dev/null
           curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
           unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot && chmod +x godot
       - name: Import the project
@@ -32,6 +35,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE=1 xvfb-run -a -s "-screen 0 1280x720x24" ./godot --path game --rendering-driver opengl3 --resolution 1280x720 -- --shots="$PWD/shots" 2>&1 | grep -v -E "ALSA|audio" | tee run.log
           grep -q "finished true" run.log
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: screenshots
           path: shots/*.png
