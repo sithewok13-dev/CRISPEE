@@ -20,6 +20,9 @@ func _ready() -> void:
 	layer = 8
 	var root := Control.new(); root.set_anchors_preset(Control.PRESET_FULL_RECT); root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(root)
+	var rest := _circle(root, 150, Color(1, 1, 1, 0.04), Color(1, 1, 1, 0.22))
+	rest.anchor_left = 0.0; rest.anchor_right = 0.0; rest.anchor_top = 1.0; rest.anchor_bottom = 1.0
+	rest.offset_left = 80; rest.offset_top = -230; rest.offset_right = 230; rest.offset_bottom = -80
 	stick_base = _circle(root, 170, Color(1, 1, 1, 0.08), Color(1, 1, 1, 0.45)); stick_base.visible = false
 	stick_knob = _circle(root, 60, Color(1, 1, 1, 0.55), Color(0, 0, 0, 0)); stick_knob.visible = false
 	var defs := [["PEE", Vector2(-160, -160), Color(0.94, 0.78, 0.16, 0.55), Color(1, 0.89, 0.42)],
@@ -28,8 +31,8 @@ func _ready() -> void:
 		["POWER", Vector2(-160, -280), Color(0.31, 0.16, 0.63, 0.5), Color(0.79, 0.66, 1.0)]]
 	for d in defs:
 		var b := _circle(root, 88, d[2], d[3])
-		b.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-		b.position = d[1]
+		b.anchor_left = 1.0; b.anchor_right = 1.0; b.anchor_top = 1.0; b.anchor_bottom = 1.0
+		b.offset_left = d[1].x; b.offset_top = d[1].y; b.offset_right = d[1].x + 88; b.offset_bottom = d[1].y + 88
 		var l := Label.new(); l.text = d[0]; l.set_anchors_preset(Control.PRESET_FULL_RECT)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		l.add_theme_font_size_override("font_size", 16); l.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -21,6 +21,7 @@ func _ready() -> void:
 	hud = load("res://scripts/hud.gd").new(); hud.name = "HUD"; add_child(hud); hud.refresh()
 	vision = load("res://scripts/pee_vision.gd").new(); vision.name = "PeeVision"; add_child(vision)
 	touch = load("res://scripts/touch_controls.gd").new(); touch.name = "Touch"; add_child(touch)
+	var feel: CanvasLayer = load("res://scripts/feel_panel.gd").new(); feel.name = "Feel"; feel.dog = dog; feel.rig = rig; add_child(feel)
 	touch.stick_changed.connect(func(d): dog.input_dir = d)
 	touch.button_pressed.connect(_on_button)
 	touch.button_released.connect(func(n): if n == "POWER": _power_held = false)
