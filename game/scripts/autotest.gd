@@ -5,13 +5,29 @@ extends Node
 var out := "shots"
 var main: Node3D
 var n := 0
+var record := false
+var _rec_i := 0
+var _rec_every := 2
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--shots="): out = a.substr(8)
+		if a == "--record": record = true
 	DirAccess.make_dir_recursive_absolute(out)
+	if record:
+		DirAccess.make_dir_recursive_absolute(out + "/frames")
 	main = get_tree().current_scene
 	_run()
+
+func _process(_delta: float) -> void:
+	if not record:
+		return
+	_rec_i += 1
+	if _rec_i % _rec_every != 0:
+		return
+	var img := get_viewport().get_texture().get_image()
+	img.resize(640, 360, Image.INTERPOLATE_BILINEAR)
+	img.save_jpg("%s/frames/f_%05d.jpg" % [out, _rec_i / _rec_every], 0.8)
 
 func _shot(tag: String) -> void:
 	await RenderingServer.frame_post_draw
